@@ -1,7 +1,7 @@
-export type KreditLine = string | null
+export type Chip = { label: string; percent: number; level: 'ok' | 'warn' | 'high'; reset?: string }
 
 declare module 'claude-code' {
   interface PluginState {
-    'kredit-figyelo': { text: KreditLine }
+    'kredit-figyelo': { chips: Chip[] }
   }
 }

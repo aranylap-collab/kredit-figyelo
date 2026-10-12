@@ -1,24 +1,19 @@
 import { atom, read, update } from 'claude-code'
-import type { Register, EngineInterface } from 'claude-code'
+import type { Register } from 'claude-code'
 import { formatStatus } from './format'
-import type { KreditLine } from '../types'
+import { chips, chipText, FILL } from './band'
 
-const line = atom({ plugin: 'kredit-figyelo', key: 'text' } as const, null as KreditLine)
-const WAITING = 'Kredit: az első válasz után frissül'
-
-async function show($: EngineInterface, text: string) {
-  $.ui.status(text)
-  await update($, line, () => text)
-}
+const state = atom({ plugin: 'kredit-figyelo', key: 'chips' } as const, [])
 
 export const register: Register = on => {
   on('session.start', async ($, e, next) => {
     const result = await next(e)
     try {
       const u = await $.session.usage()
-      await show($, formatStatus(u.rateLimits, u.context) ?? WAITING)
+      $.ui.status(formatStatus(u.rateLimits, u.context) ?? 'Keret: első válasz után frissül')
+      await update($, state, () => chips(u.rateLimits, u.context))
     } catch {
-      await show($, WAITING)
+      // a státuszsor nem kritikus
     }
     return result
   })
@@ -26,24 +21,27 @@ export const register: Register = on => {
   on('session.measure', async ($, e, next) => {
     const result = await next(e)
     const text = formatStatus(e.rateLimits, e.context)
-    if (text) await show($, text)
+    if (text) $.ui.status(text)
+    await update($, state, () => chips(e.rateLimits, e.context))
     if (e.changed.includes('rateLimits')) {
       const high = e.rateLimits.find(r => r.percentUsed >= 90)
-      if (high) {
-        const name = high.kind === 'five_hour' ? '5 órás' : high.kind === 'seven_day' ? 'heti' : high.kind
-        $.ui.toast(`Figyelem: a(z) ${name} keret ${high.percentUsed}%-on áll.`)
-      }
+      if (high) $.ui.toast(`Figyelem: a(z) ${high.kind === 'five_hour' ? '5 órás' : high.kind === 'seven_day' ? 'heti' : high.kind} keret ${high.percentUsed}%-on áll.`)
     }
     return result
   })
 
   on('ui.render', { component: 'AbovePrompt' }, async ($, e, next) => {
-    const text = await read($, line)
-    if (!text || e.props.hasSurvey) return next(e)
+    const list = await read($, state)
+    if (e.props.hasSurvey || list.length === 0) return next(e)
+
     const { Box, Text } = $.ui.resolve(e)
     return (
-      <Box>
-        <Text dimColor>{text}</Text>
+      <Box flexDirection="row" flexWrap="wrap" gap={1}>
+        {list.map(c => (
+          <Text bold color="#ffffff" backgroundColor={FILL[c.level]}>
+            {` ${chipText(c)} `}
+          </Text>
+        ))}
       </Box>
     )
   })

@@ -22,3 +22,21 @@ test('90% fölött figyelmeztető jel', () => {
 test('adat nélkül nincs szöveg', () => {
   expect(formatStatus([])).toBeUndefined()
 })
+
+import { chips, chipText } from './band'
+
+test('sáv: színszint a százalék szerint', () => {
+  const c = chips(
+    [
+      { kind: 'five_hour', percentUsed: 42, resetsAt: '2026-10-12T23:40:00Z' },
+      { kind: 'seven_day', percentUsed: 75, resetsAt: '2026-10-15T07:00:00Z' },
+      { kind: 'spend_limit', percentUsed: 95 },
+    ],
+    { window: 200000, percent: 37.4 },
+  )
+  expect(c.map(x => x.level)).toEqual(['ok', 'warn', 'high', 'ok'])
+  expect(c[3]).toEqual({ label: 'Kontextus', percent: 37, level: 'ok' })
+  expect(chipText(c[0])).toBe('5 óra 42% (↺ 01:40)')
+  expect(chipText(c[1])).toBe('Hét 75% (↺ okt. 15. 09:00)')
+  expect(chipText(c[2])).toBe('⚠ Keret 95%')
+})

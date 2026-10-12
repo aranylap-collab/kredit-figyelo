@@ -1,7 +1,7 @@
 {
   "name": "kredit-figyelo",
-  "version": "0.2.0",
-  "description": "Státuszsorban mutatja az 5 órás és heti felhasználási keretet, valamint a kontextus telítettségét.",
+  "version": "0.3.0",
+  "description": "Nagy, színes sávban a prompt fölött (és a státuszsorban) mutatja az 5 órás és heti felhasználási keretet, valamint a kontextus telítettségét.",
   "author": {
     "name": "Laci"
   },

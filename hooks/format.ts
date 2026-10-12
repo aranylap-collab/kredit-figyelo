@@ -8,7 +8,7 @@ const LABELS: Record<string, string> = {
 
 const TZ = 'Europe/Budapest'
 
-function resetText(kind: string, iso?: string): string {
+export function resetText(kind: string, iso?: string): string {
   if (!iso) return ''
   const d = new Date(iso)
   if (isNaN(d.getTime())) return ''
