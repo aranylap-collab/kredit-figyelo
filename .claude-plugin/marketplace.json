@@ -1,0 +1,13 @@
+{
+  "name": "laci-modok",
+  "owner": {
+    "name": "Laci"
+  },
+  "plugins": [
+    {
+      "name": "kredit-figyelo",
+      "source": "./"
+    }
+  ],
+  "description": "Laci saját Claude modjai"
+}

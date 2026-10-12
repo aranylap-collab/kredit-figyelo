@@ -1,0 +1,8 @@
+{
+  "name": "kredit-figyelo",
+  "version": "0.1.0",
+  "description": "Státuszsorban mutatja az 5 órás és heti felhasználási keretet, valamint a kontextus telítettségét.",
+  "author": {
+    "name": "Laci"
+  }
+}
